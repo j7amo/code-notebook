@@ -1,0 +1,99 @@
+import type * as esbuild from 'esbuild-wasm'
+import axios from 'axios'
+
+// This is a CUSTOM PLUGIN for ESBUILD.
+// Why do we need it?
+// Because we want to change the way ESBUILD works. By default,
+// ESBUILD works with files on the hard drive. And this is not
+// what we want! We are not going to store all dependencies that app user uses
+// in his code snippet on the hard drive. The user is going to request these dependencies
+// on-the-fly from the UNPKG service(which is basically a CDN for all NPM packages)
+// and the source code will be stored in browser memory.
+export const unpkgPathPlugin = (): esbuild.Plugin => {
+  // To write a plugin for ESBUILD we need to take several steps:
+  // 1) Return an object with 2 properties:
+  // - name;
+  // - setup.
+  return {
+    // This name will be printed out by esbuild during its use
+    name: 'unpkg-path-plugin',
+    // The "setup" method will be called automatically by ESBUILD service.
+    // The only argument to this method is a "build" argument that represents
+    // the WHOLE BUILD PROCESS:
+    // 1) Find files.
+    // 2) Load files.
+    // 3) Parse files.
+    // 4) Repeat steps 1-3 for every "import/require/exports" found inside the files.
+    // 5) Transpile files.
+    // 6) Bundle (join) files together.
+    setup (build: esbuild.PluginBuild) {
+      // We can interact AND intervene with the BUILD process via event listeners to change
+      // what is going on during these steps!
+      // "onResolve" is a handler that is triggered when ESBUILD starts resolving the file path
+      // for a given file, and we intercept it and do our thing:
+      build.onResolve({ filter: /.*/ }, async (args: esbuild.OnResolveArgs) => {
+        // Notice the first argument is an object with a "filter" property. We need it because
+        // we want to resolve different filenames/filetypes differently!
+        if (args.path === 'index.js') {
+          // We return an object that will be used on "onLoad" step later
+          // This object has properties:
+          // - "path";
+          // - "namespace" - this creates a namespace (sort of set) that can help later
+          // when e.g. we want to load files from namespace "a" differently from files
+          // from namespace "b" for some reason.
+          return { path: args.path, namespace: 'a' }
+        }
+
+        // Here we resolve dependencies whose paths are relative to the path of the module
+        // that is requesting them. For this we need to construct the URL the special way.
+        if (args.path.includes('./') || args.path.includes('../')) {
+          return {
+            namespace: 'a',
+            path: new URL(args.path, `https://unpkg.com${args.resolveDir}/`)
+              .href
+          }
+        }
+
+        return {
+          namespace: 'a',
+          // If a user writes something like "import React from 'react'" then
+          // we just append the package name to UNPKG URL:
+          path: `https://unpkg.com/${args.path}`
+        }
+      })
+
+      // "onLoad" is a handler that is triggered when ESBUILD attempts to load the file by path
+      build.onLoad({ filter: /.*/ }, async (args: esbuild.OnLoadArgs) => {
+        // Here we are basically hijacking/overriding/intercepting the way that ESBUILD naturally
+        // loads the files(it reads them from the filesystem)!
+        // We don't want ESBUILD to try and load "index.js" file from the hard-drive,
+        // but instead we return file content right away (we are currently mocking the file content)
+        if (args.path === 'index.js') {
+          // We return an object that contains file contents for ESBUILD to use it
+          return {
+            loader: 'jsx',
+            contents: `
+              import React, {useState} from 'react-select'
+              console.log(React, useState)
+            `
+          }
+        }
+
+        // Here we are making a request to UNPKG service to try and load package contents
+        const { data, request } = await axios.get(args.path)
+
+        return {
+          loader: 'jsx',
+          contents: data,
+          // Here we construct a correct module resolution path. Why do we need to do it?
+          // Because when we send the request to UNPKG service e.g. "GET https://unpkg.com/react",
+          // in fact we will be most likely redirected several times and the final endpoint
+          // can look like this: "https://unpkg.com/react@18.2.0/index.js" which is quite
+          // different from what was initially sent. So to correctly resolve anything based on this
+          // endpoint, we need to use the real endpoint value(the latter one).
+          resolveDir: new URL('./', request.responseURL).pathname
+        }
+      })
+    }
+  }
+}
