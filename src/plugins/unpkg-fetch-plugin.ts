@@ -40,12 +40,41 @@ export const unpkgFetchPlugin = (inputCode: string): esbuild.Plugin => {
         // If there's nothing in the cache then we make a request
         // to UNPKG service to try and load package contents:
         const { data, request } = await axios.get(args.path)
+
+        const fileType = args.path.match(/.css$/) != null ? 'css' : 'jsx'
+        // In order to make our in-browser bundler work with CSS files
+        // we need to apply some HACK. Why should we do it? ESBUILD can bundle CSS
+        // files as well, BUT... it turns out that ESBUILD will gather all CSS files
+        // referenced from a given entry point and bundle it into a sibling CSS output file
+        // next to the JavaScript output file for that JavaScript entry point.
+        // So if ESBUILD generates app.js it would also generate app.css containing all CSS files
+        // referenced by app.js. But we HAVE NO FILESYSTEM IN THE BROWSER! So we need to somehow trick
+        // ESBUILD. That's why we inject CSS contents(that we download from UNPKG) directly
+        // inside HTML document here.
+        // Before we start injecting CSS into the document,
+        // we need to remove some symbols or app is going to crash:
+        const escapedCSS = data
+          // remove new line characters
+          .replace(/\n/g, '')
+          // escape double quotes
+          .replace(/"/g, '\\"')
+          // escape single quotes
+          .replace(/'/g, "\\'")
+
+        const contents =
+          fileType === 'css'
+            ? `
+            const style = document.createElement('style');
+            style.innerText = '${escapedCSS as string}';
+            document.head.appendChild(style);
+          `
+            : data
         // If we successfully got the response from the UNPKG service,
         // then we need to:
         // 1) Construct an object compatible with ESBUILD:
         const requestResult: esbuild.OnLoadResult = {
           loader: 'jsx',
-          contents: data,
+          contents,
           // Here we construct a correct module resolution path. Why do we need to do it?
           // Because when we send the request to UNPKG service e.g. "GET https://unpkg.com/react",
           // in fact we will be most likely redirected several times and the final endpoint
