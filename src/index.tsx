@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import * as esbuild from 'esbuild-wasm'
 import { unpkgPathPlugin } from './plugins/unpkg-path-plugin'
+import { unpkgFetchPlugin } from './plugins/unpkg-fetch-plugin'
 
 const App: React.FC = () => {
   // This ref is for (1)storing AND (2)persisting
@@ -59,7 +60,7 @@ const App: React.FC = () => {
         bundle: true,
         write: false,
         // Define what plugins will be used in the process
-        plugins: [unpkgPathPlugin(text)],
+        plugins: [unpkgPathPlugin(), unpkgFetchPlugin(text)],
         // Define things that will be replaced in the process:
         define: {
           // When ESBUILD finds a "process.env.NODE_ENV" inside the code,
