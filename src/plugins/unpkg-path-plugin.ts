@@ -37,34 +37,36 @@ export const unpkgPathPlugin = (inputCode: string): esbuild.Plugin => {
       // We can interact AND intervene with the BUILD process via event listeners to change
       // what is going on during these steps!
       // "onResolve" is a handler that is triggered when ESBUILD starts resolving the file path
-      // for a given file, and we intercept it and do our thing:
+      // for a given file, and we intercept it and do our thing.
+      // Notice the first argument is an object with a "filter" property. We need it because
+      // we want to resolve different filenames/filetypes differently!
+      build.onResolve({ filter: /(^index\.js$)/ }, () => {
+        // We return an object that will be used on "onLoad" step later
+        // This object has properties:
+        // - "path";
+        // - "namespace" - this creates a namespace (sort of set) that can help later
+        // when e.g. we want to load files from namespace "a" differently from files
+        // from namespace "b" for some reason.
+        return {
+          path: 'index.js',
+          namespace: 'a'
+        }
+      })
+
+      // Here we resolve dependencies whose paths are relative to the path of the main module
+      // that is requesting them. For this we need to construct the URL the special way.
+      build.onResolve({ filter: /^\.+\// }, (args: esbuild.OnResolveArgs) => {
+        return {
+          namespace: 'a',
+          path: new URL(args.path, `https://unpkg.com${args.resolveDir}/`).href
+        }
+      })
+
       build.onResolve({ filter: /.*/ }, async (args: esbuild.OnResolveArgs) => {
-        // Notice the first argument is an object with a "filter" property. We need it because
-        // we want to resolve different filenames/filetypes differently!
-        if (args.path === 'index.js') {
-          // We return an object that will be used on "onLoad" step later
-          // This object has properties:
-          // - "path";
-          // - "namespace" - this creates a namespace (sort of set) that can help later
-          // when e.g. we want to load files from namespace "a" differently from files
-          // from namespace "b" for some reason.
-          return { path: args.path, namespace: 'a' }
-        }
-
-        // Here we resolve dependencies whose paths are relative to the path of the module
-        // that is requesting them. For this we need to construct the URL the special way.
-        if (args.path.includes('./') || args.path.includes('../')) {
-          return {
-            namespace: 'a',
-            path: new URL(args.path, `https://unpkg.com${args.resolveDir}/`)
-              .href
-          }
-        }
-
         return {
           namespace: 'a',
           // If a user writes something like "import React from 'react'" then
-          // we just append the package name to UNPKG URL:
+          // we just append the package (main module) name to UNPKG URL:
           path: `https://unpkg.com/${args.path}`
         }
       })
