@@ -52,13 +52,14 @@ const App: React.FC = () => {
     // of the ESBUILD service and passing "options" object to it:
     ref.current
       .build({
-        // We define where ESBUILD should start
+        // When we bundle the code with ESBUILD, we DON'T PROVIDE THE CODE!
+        // Instead, we define the file where ESBUILD should start:
         entryPoints: ['index.js'],
         // Define if ESBUILD should also bundle the code (not only transpile it)
         bundle: true,
         write: false,
         // Define what plugins will be used in the process
-        plugins: [unpkgPathPlugin()],
+        plugins: [unpkgPathPlugin(text)],
         // Define things that will be replaced in the process:
         define: {
           // When ESBUILD finds a "process.env.NODE_ENV" inside the code,

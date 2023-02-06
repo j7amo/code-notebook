@@ -16,7 +16,7 @@ const fileCache = localforage.createInstance({
 // in his code snippet on the hard drive. The user is going to request these dependencies
 // on-the-fly from the UNPKG service(which is basically a CDN for all NPM packages)
 // and the source code will be stored in browser memory.
-export const unpkgPathPlugin = (): esbuild.Plugin => {
+export const unpkgPathPlugin = (inputCode: string): esbuild.Plugin => {
   // To write a plugin for ESBUILD we need to take several steps:
   // 1) Return an object with 2 properties:
   // - name;
@@ -79,10 +79,9 @@ export const unpkgPathPlugin = (): esbuild.Plugin => {
           // We return an object that contains file contents for ESBUILD to use it
           return {
             loader: 'jsx',
-            contents: `
-              import React, {useState} from 'react-select'
-              console.log(React, useState)
-            `
+            // The value of "contents" field should be the one that the user of our app
+            // entered in the text input:
+            contents: inputCode
           }
         }
 
