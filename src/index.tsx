@@ -25,14 +25,17 @@ const App: React.FC = () => {
       worker: true, // <- this is not needed, it's here for educational purpose
       // The URL of the “esbuild.wasm” file.
       // This must be provided when running esbuild in the browser.
-      // p.s. We took this file from the "/node_modules/esbuild-wasm" folder
-      // and placed it inside "public" folder. Why?
+      // p.s. At first, we took this file from the "/node_modules/esbuild-wasm" folder
+      // and placed it inside "public" folder so that we can reference it when running the app.
+      // Why?
       // If you put a file into the public folder, it will not be processed by webpack.
       // Instead, it will be copied into the build folder COMPLETELY UNTOUCHED (which is what we need)
       // which means:
       // - it is not post-processed or minified;
       // - filename won’t include content hash.
-      wasmURL: '/esbuild.wasm'
+      // BUT later we decided to remove this workaround and simply provide a link to
+      // this file hosted on the UNPKG service:
+      wasmURL: 'https://unpkg.com/esbuild-wasm@0.8.27/esbuild.wasm'
     })
   }
 
