@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import * as esbuild from 'esbuild-wasm'
 import { unpkgPathPlugin } from './plugins/unpkg-path-plugin'
 import { unpkgFetchPlugin } from './plugins/unpkg-fetch-plugin'
+import CodeEditor from './components/code-editor'
 
 const App: React.FC = () => {
   // This ref is for (1)storing AND (2)persisting
@@ -41,10 +42,8 @@ const App: React.FC = () => {
     })
   }
 
-  const onChangeHandler = (
-    evt: React.ChangeEvent<HTMLTextAreaElement>
-  ): void => {
-    setText(evt.target.value)
+  const onEditorChangeHandler = (value: string): void => {
+    setText(value)
   }
 
   const onSubmitHandler = (): void => {
@@ -179,12 +178,16 @@ const App: React.FC = () => {
 
   return (
     <div>
-      <textarea value={text} onChange={onChangeHandler}></textarea>
-      <div>
-        <button onClick={onSubmitHandler} type="button">
-          Submit
-        </button>
-      </div>
+      <CodeEditor
+        initialValue="console.log(123);"
+        onChange={onEditorChangeHandler}
+      />
+      {/* <textarea value={text} onChange={onChangeHandler}></textarea> */}
+      {/* <div> */}
+      {/*  <button onClick={onSubmitHandler} type="button"> */}
+      {/*    Submit */}
+      {/*  </button> */}
+      {/* </div> */}
       {/* To isolate the contents of the iframe(i.e. prevent communication
        between parent document and the document inside an iframe) we need to
        make sure that:
