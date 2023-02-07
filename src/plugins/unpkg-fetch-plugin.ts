@@ -13,12 +13,13 @@ export const unpkgFetchPlugin = (inputCode: string): esbuild.Plugin => {
     name: 'unpkg-fetch-plugin',
     setup (build: esbuild.PluginBuild) {
       // "onLoad" is a handler that is triggered when ESBUILD attempts to load the file by path
-      build.onLoad({ filter: /.*/ }, async (args: esbuild.OnLoadArgs) => {
-        // Here we are basically hijacking/overriding/intercepting the way that ESBUILD naturally
-        // loads the files(it reads them from the filesystem)!
-        // We don't want ESBUILD to try and load "index.js" file from the hard-drive,
-        // but instead we return file content right away (we are currently mocking the file content)
-        if (args.path === 'index.js') {
+      // Here we are basically hijacking/overriding/intercepting the way that ESBUILD naturally
+      // loads the files(it reads them from the filesystem)!
+      // We don't want ESBUILD to try and load "index.js" file from the hard-drive,
+      // but instead we return file content right away (we are currently mocking the file content)
+      build.onLoad(
+        { filter: /(^index\.js$)/ },
+        async (args: esbuild.OnLoadArgs) => {
           // We return an object that contains file contents for ESBUILD to use it
           return {
             loader: 'jsx',
@@ -27,21 +28,29 @@ export const unpkgFetchPlugin = (inputCode: string): esbuild.Plugin => {
             contents: inputCode
           }
         }
+      )
 
+      // We extract duplicating logic into a separate "onLoad" handler.
+      // It turns out that it is not mandatory to return from it.
+      // If nothing is returned then ESBUILD will just go to the next "onLoad" handler.
+      // But if we return something then ESBUILD will be satisfied by this handler
+      // and won't go to other ones.
+      build.onLoad({ filter: /.*/ }, async (args: esbuild.OnLoadArgs) => {
         // We need to check if we already fetched the package and if it is in the cache.
         const cachedResult = await fileCache.getItem<esbuild.OnLoadResult>(
           args.path
         )
 
         if (cachedResult != null) {
-          // If so then we return it:
+          // If YES then we return it
+          // and no other "onLoad" handler will fire after this one:
           return cachedResult
         }
-        // If there's nothing in the cache then we make a request
-        // to UNPKG service to try and load package contents:
+      })
+
+      build.onLoad({ filter: /.css$/ }, async (args: esbuild.OnLoadArgs) => {
         const { data, request } = await axios.get(args.path)
 
-        const fileType = args.path.match(/.css$/) != null ? 'css' : 'jsx'
         // In order to make our in-browser bundler work with CSS files
         // we need to apply some HACK. Why should we do it? ESBUILD can bundle CSS
         // files as well, BUT... it turns out that ESBUILD will gather all CSS files
@@ -61,20 +70,34 @@ export const unpkgFetchPlugin = (inputCode: string): esbuild.Plugin => {
           // escape single quotes
           .replace(/'/g, "\\'")
 
-        const contents =
-          fileType === 'css'
-            ? `
+        const contents = `
             const style = document.createElement('style');
             style.innerText = '${escapedCSS as string}';
             document.head.appendChild(style);
           `
-            : data
+
+        const requestResult: esbuild.OnLoadResult = {
+          loader: 'jsx',
+          contents,
+          resolveDir: new URL('./', request.responseURL).pathname
+        }
+
+        await fileCache.setItem(args.path, requestResult)
+
+        return requestResult
+      })
+
+      build.onLoad({ filter: /.*/ }, async (args: esbuild.OnLoadArgs) => {
+        // If there's nothing in the cache then we make a request
+        // to UNPKG service to try and load package contents:
+        const { data, request } = await axios.get(args.path)
+
         // If we successfully got the response from the UNPKG service,
         // then we need to:
         // 1) Construct an object compatible with ESBUILD:
         const requestResult: esbuild.OnLoadResult = {
           loader: 'jsx',
-          contents,
+          contents: data,
           // Here we construct a correct module resolution path. Why do we need to do it?
           // Because when we send the request to UNPKG service e.g. "GET https://unpkg.com/react",
           // in fact we will be most likely redirected several times and the final endpoint
