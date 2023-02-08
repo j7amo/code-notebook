@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import './preview.css'
 
 interface PreviewProps {
   code: string
@@ -77,12 +78,14 @@ const Preview: React.FC<PreviewProps> = ({ code }) => {
     // which will result in incorrect work of our app.
     // 3) Use "postMessage" method to send the code to all the listeners waiting for it.
     // Attach eventListener to an iframe, get the event and extract the code from the event data.
-    <iframe
-      title="code-execution-result"
-      sandbox="allow-scripts"
-      ref={iframeRef}
-      srcDoc={html}
-    />
+    <div className="preview-wrapper">
+      <iframe
+        title="code-execution-result"
+        sandbox="allow-scripts"
+        ref={iframeRef}
+        srcDoc={html}
+      />
+    </div>
   )
 }
 

@@ -1,0 +1,26 @@
+.preview-wrapper {
+    position: relative;
+    height: 100%;
+    /* we add this to take all available space */
+    flex-grow: 1;
+}
+
+.preview-wrapper iframe {
+    height: 100%;
+    width: 100%;
+    background-color: white;
+}
+
+/*This is a HACK that we need to use for resizing working properly
+ over iframe area(the problem is: when the mouse cursor is over iframe area
+ events start to bubble up the document that is inside iframe, but we handle these
+ events inside main document)*/
+.react-draggable-transparent-selection .preview-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    opacity: 0;
+}
