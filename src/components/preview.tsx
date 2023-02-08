@@ -54,7 +54,14 @@ const Preview: React.FC<PreviewProps> = ({ code }) => {
     // 8) User stops using our app.
     if (iframeRef.current != null) {
       iframeRef.current.srcdoc = html
-      iframeRef.current.contentWindow?.postMessage(code, '*')
+      // We give iframe some time to reset html contents
+      // before we post a message with the code we want to execute.
+      // Why do we need this? Because without this small hack we are
+      // posting a message to an "old" iframe content AND
+      // then reset it with the template, and that's not what we want!
+      setTimeout(() => {
+        iframeRef.current?.contentWindow?.postMessage(code, '*')
+      }, 100)
     }
   }, [code])
 
