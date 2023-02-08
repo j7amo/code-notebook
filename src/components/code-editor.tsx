@@ -11,6 +11,7 @@ interface CodeEditorProps {
 
 const CodeEditor: React.FC<CodeEditorProps> = ({ initialValue, onChange }) => {
   // Define ref for storing the Editor instance
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editorRef = useRef<any>()
   // Here we define the function that will be called when "Editor" is mounted:
   const onEditorDidMount: EditorDidMount = (getValue, editor): void => {
@@ -64,7 +65,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ initialValue, onChange }) => {
         // The combination of these 2 arguments is basically an "onChange" handler we need!
         editorDidMount={onEditorDidMount}
         value={initialValue}
-        height="300px"
+        height="100%"
         language="javascript"
         theme="dark"
         options={{

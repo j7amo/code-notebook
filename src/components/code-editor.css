@@ -1,6 +1,8 @@
 .editor-wrapper {
     position: relative;
     height: 100%;
+    /* we need this to have screen space available for the resizing bar */
+    width: calc(100% - 10px);
 }
 
 .editor-wrapper .button-format {
