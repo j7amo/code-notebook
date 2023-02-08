@@ -8,7 +8,6 @@
 .preview-wrapper iframe {
     height: 100%;
     width: 100%;
-    background-color: white;
 }
 
 /*This is a HACK that we need to use for resizing working properly

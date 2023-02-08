@@ -14,7 +14,7 @@ interface PreviewProps {
 // This way we can now avoid "srcDoc"-ONLY approach's limitations
 // and transfer as much code as we want.
 const html = `
-  <html>
+  <html style='background-color: white'>
     <head></head>
     <body>
       <div id='root'></div>

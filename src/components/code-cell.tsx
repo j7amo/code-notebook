@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import bundler from '../bundler'
 import CodeEditor from './code-editor'
 import Preview from './preview'
+import Resizable from './resizable'
 
 // We extracted the whole "input-text->bundle-transpile-code->execute-code"
 // flow to a separate "CodeCell" component. We need this because we
@@ -60,13 +61,17 @@ const CodeCell: React.FC = () => {
   }
 
   return (
-    <div>
-      <CodeEditor initialValue={text} onChange={onEditorChangeHandler} />
-      <button type="button" onClick={onSubmitHandler}>
-        Submit
-      </button>
-      <Preview code={code} />
-    </div>
+    // Here we wrap different blocks (code editor and preview window)
+    // with "Resizable" component and specify the direction in which
+    // we want resizing to be enabled:
+    <Resizable direction="vertical">
+      <div style={{ display: 'flex', height: '100%' }}>
+        <Resizable direction="horizontal">
+          <CodeEditor initialValue={text} onChange={onEditorChangeHandler} />
+        </Resizable>
+        <Preview code={code} />
+      </div>
+    </Resizable>
   )
 }
 
