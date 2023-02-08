@@ -10,6 +10,13 @@
     width: 100%;
 }
 
+.preview-error {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: red;
+}
+
 /*This is a HACK that we need to use for resizing working properly
  over iframe area(the problem is: when the mouse cursor is over iframe area
  events start to bubble up the document that is inside iframe, but we handle these

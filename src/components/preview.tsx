@@ -3,6 +3,7 @@ import './preview.css'
 
 interface PreviewProps {
   code: string
+  bundlingError: string
 }
 
 // This HTML is rendered inside an iframe via "srcDoc" attribute.
@@ -10,23 +11,44 @@ interface PreviewProps {
 // window and document objects) and listening for a "message" event that we post/send
 // after ESBUILD finished its work. When such an event occurs we handle it by
 // (1)extracting the "data" property(which is going to be a string)
-// from the "event" object itself AND calling the EVAL with this string.
+// from the "event" object itself AND (2)calling the EVAL with this string.
 // This way we can now avoid "srcDoc"-ONLY approach's limitations
 // and transfer as much code as we want.
+// Also, we set up error handling inside this code:
+// 1) Generally we handle errors with the help of "handleError" function
+// that (1)renders error in the preview window and (2)also prints it
+// to the browser console.
+// 2) To catch SYNCHRONOUS RUNTIME errors we (1)listen for "message"
+// event on the window object, (2)get the "data" field from the "event",
+// (3)try to run execute it via "eval" inside try-catch block and (4)call
+// "handleError" inside catch block if there's such an error.
+// 3) To catch ASYNCHRONOUS RUNTIME errors we (1)listen for "error"
+// event on the window object, (2)call "preventDefault" method on "event"
+// to prevent default browser behaviour(which is printing error to the browser
+// console which we already do with the help of our own function and don't want
+// to duplicate), (3)call "handleError".
+
 const html = `
   <html style='background-color: white'>
     <head></head>
     <body>
       <div id='root'></div>
         <script>
+        const handleError = (err) => {
+          const root = document.getElementById('root');
+          root.innerHTML = '<div style="color: red;"><h4>Runtime Error</h4>' + err + '</div>';
+          console.error(err);
+        }
+          window.addEventListener('error', (event) => {
+            event.preventDefault();
+            handleError(event.error);
+          })
+        
           window.addEventListener('message', (event) => {
-            // Keep in mind that try-catch does not catch async errors
             try {
-              eval(event.data)
+              eval(event.data);
             } catch (err) {
-              const root = document.getElementById('root')
-              root.innerHTML = '<div style="color: red;"><h4>Runtime Error</h4>' + err + '</div>'
-              console.error(err)
+              handleError(err);
             }
           }, false)
         </script>
@@ -34,7 +56,7 @@ const html = `
   </html>
 `
 
-const Preview: React.FC<PreviewProps> = ({ code }) => {
+const Preview: React.FC<PreviewProps> = ({ code, bundlingError }) => {
   // We need this ref to be able to call a "postMessage"
   // on the iframe after bundling/transpiling of the code has finished:
   const iframeRef = useRef<HTMLIFrameElement>(null)
@@ -92,6 +114,9 @@ const Preview: React.FC<PreviewProps> = ({ code }) => {
         ref={iframeRef}
         srcDoc={html}
       />
+      {bundlingError != null && (
+        <div className="preview-error">{bundlingError}</div>
+      )}
     </div>
   )
 }

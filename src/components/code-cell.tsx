@@ -12,15 +12,17 @@ const CodeCell: React.FC = () => {
   const [text, setText] = useState('')
   // Code - what is bundled-transpiled and ready to be executed:
   const [code, setCode] = useState('')
+  const [error, setError] = useState('')
 
   useEffect(() => {
     const timer = setTimeout(() => {
       bundler(text)
         .then((result) => {
           // If the bundle-transpile process succeeds,
-          // then we update "code" state slice
-          // and pass this value via prop to "Preview" component.
-          setCode(result)
+          // then we update "code" AND "error" state pieces
+          // and pass these values via props to "Preview" component.
+          setCode(result.code)
+          setError(result.err)
           // Now when ESBUILD has bundled and transpiled code, there is another major question:
           // how are we going to execute the code user provided?
           // The straightforward way of doing this is using EVAL:
@@ -75,7 +77,7 @@ const CodeCell: React.FC = () => {
         <Resizable direction="horizontal">
           <CodeEditor initialValue={text} onChange={onEditorChangeHandler} />
         </Resizable>
-        <Preview code={code} />
+        <Preview code={code} bundlingError={error} />
       </div>
     </Resizable>
   )
