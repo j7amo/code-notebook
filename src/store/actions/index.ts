@@ -4,13 +4,15 @@
 import { type ActionType } from '../action-types'
 import { type CellTypes } from '../cell'
 
+export type Direction = 'up' | 'down'
+
 export interface MoveCellAction {
   type: ActionType.MOVE_CELL
   payload: {
     // "id" of the cell that we want to move
     id: string
     // Because user can move cells up/down, we need to know the direction
-    direction: 'up' | 'down'
+    direction: Direction
   }
 }
 
