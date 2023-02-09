@@ -4,7 +4,7 @@ import cellsReducer from './cellsReducer'
 // Create state slices inside global state
 // and assign corresponding reducers to manage them
 const reducers = combineReducers({
-  cell: cellsReducer
+  cells: cellsReducer
 })
 
 export default reducers
