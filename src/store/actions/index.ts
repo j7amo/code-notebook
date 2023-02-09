@@ -29,7 +29,12 @@ export interface InsertCellBeforeAction {
   // - type of the cell we are inserting (we need this because
   // we are also creating a new cell here)
   payload: {
-    id: string
+    // Here is something interesting:
+    // Just to be able to handle one single corner-case
+    // of inserting the cell to the very last index of cells array
+    // we decide that we can pass "null" instead of specific "id"
+    // when we want to do it!
+    id: string | null
     type: CellTypes
   }
 }
