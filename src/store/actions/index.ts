@@ -4,7 +4,7 @@
 import { type ActionType } from '../action-types'
 import { type CellTypes } from '../cell'
 
-interface MoveCellAction {
+export interface MoveCellAction {
   type: ActionType.MOVE_CELL
   payload: {
     // "id" of the cell that we want to move
@@ -14,13 +14,13 @@ interface MoveCellAction {
   }
 }
 
-interface DeleteCellAction {
+export interface DeleteCellAction {
   type: ActionType.DELETE_CELL
   // To delete the cell from cells array we only need to know its id
   payload: string
 }
 
-interface InsertCellBeforeAction {
+export interface InsertCellBeforeAction {
   type: ActionType.INSERT_CELL_BEFORE
   // To insert a new cell before another cell we need to know:
   // - id of the cell to insert the new one before;
@@ -32,7 +32,7 @@ interface InsertCellBeforeAction {
   }
 }
 
-interface UpdateCellAction {
+export interface UpdateCellAction {
   type: ActionType.UPDATE_CELL
   // To update a cell we need to know:
   // - id of the cell;
