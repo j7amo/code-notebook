@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */
 import React, { useEffect, useRef, useState } from 'react'
 import MDEditor from '@uiw/react-md-editor'
+import './text-editor.css'
 
 const TextEditor: React.FC = () => {
   // This piece of state is for tracking the current mode
@@ -42,7 +43,8 @@ const TextEditor: React.FC = () => {
 
   if (isEditMode) {
     return (
-      <div ref={ref}>
+      // We are adding the className to be able to override default styling
+      <div className="text-editor" ref={ref}>
         <MDEditor />
       </div>
     )
@@ -50,7 +52,7 @@ const TextEditor: React.FC = () => {
   return (
     // We have to use "onClick" event handler on DIV
     // just because the component does not have it...
-    <div onClick={onMarkdownClick}>
+    <div className="text-editor" onClick={onMarkdownClick}>
       <MDEditor.Markdown source={'# Header'} />
     </div>
   )
