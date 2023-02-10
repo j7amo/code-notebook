@@ -1,5 +1,6 @@
 import React from 'react'
 import { useActions } from '../hooks/use-actions'
+import './action-bar.css'
 
 interface ActionBarProps {
   id: string
@@ -21,15 +22,33 @@ const ActionBar: React.FC<ActionBarProps> = ({ id }) => {
   }
 
   return (
-    <div>
-      <button type="button" onClick={onUpClickHandler}>
-        Up
+    <div className="action-bar">
+      <button
+        className="button is-primary is-small"
+        type="button"
+        onClick={onUpClickHandler}
+      >
+        <span className="icon">
+          <i className="fas fa-arrow-up"></i>
+        </span>
       </button>
-      <button type="button" onClick={onDownClickHandler}>
-        Down
+      <button
+        className="button is-primary is-small"
+        type="button"
+        onClick={onDownClickHandler}
+      >
+        <span className="icon">
+          <i className="fas fa-arrow-down"></i>
+        </span>
       </button>
-      <button type="button" onClick={onDeleteClickHandler}>
-        Delete
+      <button
+        className="button is-primary is-small"
+        type="button"
+        onClick={onDeleteClickHandler}
+      >
+        <span className="icon">
+          <i className="fas fa-times"></i>
+        </span>
       </button>
     </div>
   )
