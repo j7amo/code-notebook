@@ -2,16 +2,20 @@
 import React, { useEffect, useRef, useState } from 'react'
 import MDEditor from '@uiw/react-md-editor'
 import './text-editor.css'
+import { type Cell } from '../store'
+import { useActions } from '../hooks/use-actions'
 
-const TextEditor: React.FC = () => {
+interface TextEditorProps {
+  cell: Cell
+}
+
+const TextEditor: React.FC<TextEditorProps> = ({ cell }) => {
   // We need this ref for tracking the on DIV click event.
   const ref = useRef<HTMLDivElement>(null)
   // This piece of state is for tracking the current mode
   // and using it to render corresponding component.
   const [isEditMode, setIsEditMode] = useState(false)
-  // Thi piece of state is for storing the user input that was made inside the editor
-  // so that we can show it also in preview version of our component
-  const [editorInput, setEditorInput] = useState('# Header')
+  const { updateCell } = useActions()
 
   useEffect(() => {
     const listener = (evt: MouseEvent): void => {
@@ -47,14 +51,14 @@ const TextEditor: React.FC = () => {
   const onEditorChange = (input: string | undefined): void => {
     // We have to use ternary operator here because input can be either "string"
     // or "undefined" and our piece of state expects "string" only
-    setEditorInput(input != null ? input : '')
+    updateCell(cell.id, input != null ? input : '')
   }
 
   if (isEditMode) {
     return (
       // We are adding the className to be able to override default styling
       <div className="text-editor" ref={ref}>
-        <MDEditor value={editorInput} onChange={onEditorChange} />
+        <MDEditor value={cell.content} onChange={onEditorChange} />
       </div>
     )
   }
@@ -63,7 +67,7 @@ const TextEditor: React.FC = () => {
     // just because the component does not have it...
     <div className="text-editor card" onClick={onMarkdownClick}>
       <div className="card-content">
-        <MDEditor.Markdown source={editorInput} />
+        <MDEditor.Markdown source={cell.content || 'Click to edit'} />
       </div>
     </div>
   )

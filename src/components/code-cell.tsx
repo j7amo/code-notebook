@@ -1,22 +1,27 @@
 import React, { useEffect, useState } from 'react'
 import bundler from '../bundler'
+import { type Cell } from '../store'
+import { useActions } from '../hooks/use-actions'
 import CodeEditor from './code-editor'
 import Preview from './preview'
 import Resizable from './resizable'
 
+interface CodeCellProps {
+  cell: Cell
+}
+
 // We extracted the whole "input-text->bundle-transpile-code->execute-code"
 // flow to a separate "CodeCell" component. We need this because we
 // want to have as many code snippets on the screen as we want.
-const CodeCell: React.FC = () => {
-  // Text - what user entered inside Code Editor:
-  const [text, setText] = useState('')
+const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
   // Code - what is bundled-transpiled and ready to be executed:
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
+  const { updateCell } = useActions()
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      bundler(text)
+      bundler(cell.content)
         .then((result) => {
           // If the bundle-transpile process succeeds,
           // then we update "code" AND "error" state pieces
@@ -62,10 +67,10 @@ const CodeCell: React.FC = () => {
     return () => {
       clearTimeout(timer)
     }
-  }, [text])
+  }, [cell.content])
 
   const onEditorChangeHandler = (value: string): void => {
-    setText(value)
+    updateCell(cell.id, value)
   }
 
   return (
@@ -75,7 +80,10 @@ const CodeCell: React.FC = () => {
     <Resizable direction="vertical">
       <div style={{ display: 'flex', height: '100%' }}>
         <Resizable direction="horizontal">
-          <CodeEditor initialValue={text} onChange={onEditorChangeHandler} />
+          <CodeEditor
+            initialValue={cell.content}
+            onChange={onEditorChangeHandler}
+          />
         </Resizable>
         <Preview code={code} bundlingError={error} />
       </div>
