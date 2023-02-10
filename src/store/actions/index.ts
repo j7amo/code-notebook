@@ -51,6 +51,24 @@ export interface UpdateCellAction {
   }
 }
 
+export interface BundleStartAction {
+  type: ActionType.BUNDLE_START
+  payload: {
+    cellId: string
+  }
+}
+
+export interface BundleCompleteAction {
+  type: ActionType.BUNDLE_COMPLETE
+  payload: {
+    cellId: string
+    bundle: {
+      code: string
+      error: string
+    }
+  }
+}
+
 // Now we need to export all these interfaces to use them in other files.
 // The easiest way of doing it is creating a type that is a UNION of these interfaces
 // and export it instead of exporting interfaces one by one:
@@ -59,3 +77,5 @@ export type Action =
   | DeleteCellAction
   | InsertCellAfterAction
   | UpdateCellAction
+  | BundleStartAction
+  | BundleCompleteAction

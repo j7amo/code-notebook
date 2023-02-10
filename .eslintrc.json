@@ -69,6 +69,7 @@
     "import/order": "error",
     "no-shadow": "warn",
     "no-use-before-define": "off",
+    "@typescript-eslint/key-spacing": "off",
     "@typescript-eslint/no-shadow": "error",
     "@typescript-eslint/ban-ts-comment": 0,
     "@typescript-eslint/no-explicit-any": "error",

@@ -1,10 +1,12 @@
 import { combineReducers } from 'redux'
 import cellsReducer from './cellsReducer'
+import bundlesReducer from './bundlesReducer'
 
 // Create state slices inside global state
 // and assign corresponding reducers to manage them
 const reducers = combineReducers({
-  cells: cellsReducer
+  cells: cellsReducer,
+  bundles: bundlesReducer
 })
 
 export default reducers
