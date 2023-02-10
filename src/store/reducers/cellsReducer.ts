@@ -85,7 +85,7 @@ const reducer = produce(
 
         return state
       }
-      case ActionType.INSERT_CELL_BEFORE: {
+      case ActionType.INSERT_CELL_AFTER: {
         const { id, type } = action.payload
         // When inserting new cell we need to create a new cell object first
         const newCell: Cell = {
@@ -100,9 +100,9 @@ const reducer = produce(
         // Add its id to "order" array
         if (id != null) {
           const index = state.order.findIndex((cellId) => cellId === id)
-          state.order.splice(index, 0, newCell.id)
+          state.order.splice(index + 1, 0, newCell.id)
         } else {
-          state.order.push(newCell.id)
+          state.order.unshift(newCell.id)
         }
 
         return state

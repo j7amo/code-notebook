@@ -1,7 +1,7 @@
 import {
   type DeleteCellAction,
   type Direction,
-  type InsertCellBeforeAction,
+  type InsertCellAfterAction,
   type MoveCellAction,
   type UpdateCellAction
 } from '../actions'
@@ -32,12 +32,12 @@ export const moveCell = (id: string, direction: Direction): MoveCellAction => {
   }
 }
 
-export const insertCellBefore = (
-  id: string,
+export const insertCellAfter = (
+  id: string | null,
   type: CellTypes
-): InsertCellBeforeAction => {
+): InsertCellAfterAction => {
   return {
-    type: ActionType.INSERT_CELL_BEFORE,
+    type: ActionType.INSERT_CELL_AFTER,
     payload: {
       id,
       type

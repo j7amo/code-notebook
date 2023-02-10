@@ -22,10 +22,10 @@ export interface DeleteCellAction {
   payload: string
 }
 
-export interface InsertCellBeforeAction {
-  type: ActionType.INSERT_CELL_BEFORE
-  // To insert a new cell before another cell we need to know:
-  // - id of the cell to insert the new one before;
+export interface InsertCellAfterAction {
+  type: ActionType.INSERT_CELL_AFTER
+  // To insert a new cell after another cell we need to know:
+  // - id of the cell to insert the new one after;
   // - type of the cell we are inserting (we need this because
   // we are also creating a new cell here)
   payload: {
@@ -57,5 +57,5 @@ export interface UpdateCellAction {
 export type Action =
   | MoveCellAction
   | DeleteCellAction
-  | InsertCellBeforeAction
+  | InsertCellAfterAction
   | UpdateCellAction
