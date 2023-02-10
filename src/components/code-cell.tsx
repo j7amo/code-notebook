@@ -5,6 +5,7 @@ import { useTypedSelector } from '../hooks/use-typed-selector'
 import CodeEditor from './code-editor'
 import Resizable from './resizable'
 import Preview from './preview'
+import './code-cell.css'
 
 interface CodeCellProps {
   cell: Cell
@@ -19,6 +20,11 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
   const { updateCell, createBundle } = useActions()
 
   useEffect(() => {
+    if (bundle == null) {
+      createBundle(cell.id, cell.content)
+      return
+    }
+
     const timer = setTimeout(() => {
       createBundle(cell.id, cell.content)
     }, 1000)
@@ -26,7 +32,7 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
     return () => {
       clearTimeout(timer)
     }
-  }, [cell.content, cell.id])
+  }, [cell.content, cell.id, createBundle])
 
   const onEditorChangeHandler = (value: string): void => {
     updateCell(cell.id, value)
@@ -44,9 +50,19 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
             onChange={onEditorChangeHandler}
           />
         </Resizable>
-        {bundle != null && (
-          <Preview code={bundle.code} bundlingError={bundle.error} />
-        )}
+        <div className="progress-wrapper">
+          {bundle == null || bundle.processing
+            ? (
+            <div className="progress-cover">
+              <progress className="progress is-small is-primary" max="100">
+                Loading...
+              </progress>
+            </div>
+              )
+            : (
+            <Preview code={bundle.code} bundlingError={bundle.error} />
+              )}
+        </div>
       </div>
     </Resizable>
   )
