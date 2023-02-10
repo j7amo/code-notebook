@@ -78,7 +78,7 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
     // with "Resizable" component and specify the direction in which
     // we want resizing to be enabled:
     <Resizable direction="vertical">
-      <div style={{ display: 'flex', height: '100%' }}>
+      <div style={{ display: 'flex', height: 'calc(100% - 10px)' }}>
         <Resizable direction="horizontal">
           <CodeEditor
             initialValue={cell.content}

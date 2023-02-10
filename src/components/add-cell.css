@@ -1,0 +1,37 @@
+.add-cell {
+    position: relative;
+    opacity: 0;
+    /* We don't want to show AddCell UI when user quickly moves the cursor
+     over the AddCell component without any intention of using it. And we want to
+     start showing it when user spends good amount of time hovering over AddCell UI.
+     For this we can add a "delay" to transition property of 0.1s for example:*/
+    transition: opacity 0.3s ease-in 0.1s;
+    margin: 10px 0;
+}
+
+.add-cell:hover {
+    opacity: 1.0;
+}
+
+.add-cell.force-visible {
+    opacity: 1;
+}
+
+.add-cell .add-buttons {
+    display: flex;
+    justify-content: center;
+}
+
+.add-cell .add-buttons button {
+    margin: 0 40px;
+}
+
+.divider {
+    position: absolute;
+    top: 50%;
+    left: 5%;
+    height: 1px;
+    border-bottom: 1px solid gray;
+    width: 90%;
+    z-index: -1;
+}
