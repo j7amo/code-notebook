@@ -56,7 +56,11 @@ const bundler = async (rawCode: string): Promise<BundlerResult> => {
         // it transpiles, it will replace it with "window" (keep in mind that
         // browser doesn't know anything about "global" variable!)
         global: 'window'
-      }
+      },
+      // We tell ESBUILD to use "_React"(our own custom "behind-the-scenes" import)
+      // instead of "React" (user imported)
+      jsxFactory: '_React.createElement',
+      jsxFragment: '_React.Fragment'
     })
 
     return {
