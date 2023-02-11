@@ -17,22 +17,43 @@ interface CodeCellProps {
 const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
   // Bundle - what is bundled-transpiled and ready to be executed.
   const bundle = useTypedSelector((state) => state.bundles[cell.id])
+  // We want to add another feature to our app:
+  // Current Code cell should have access to all previous code cell's code.
+  // So that user can e.g. define a function in Cell #1 and execute this function
+  // later in the Cell #10.
+  // To achieve this we just take all previous code cells + current cell contents
+  // and join them. And only after it, we create a bundle that will contain all the code
+  // from cells starting with Cell #1 and ending with Cell #10.
+  const cumulativeCode = useTypedSelector((state) => {
+    const { data, order } = state.cells
+    const index = order.findIndex((cellId) => cellId === cell.id)
+    const truncatedCellsOrderList = order.slice(0, index + 1)
+    const orderedCells = truncatedCellsOrderList.map((cellId) => data[cellId])
+    const orderedCodeCells = orderedCells.filter((item) => item.type === 'code')
+
+    return orderedCodeCells
+      .map((item) => {
+        return item.content
+      })
+      .join('\n')
+  })
+
   const { updateCell, createBundle } = useActions()
 
   useEffect(() => {
     if (bundle == null) {
-      createBundle(cell.id, cell.content)
+      createBundle(cell.id, cumulativeCode)
       return
     }
 
     const timer = setTimeout(() => {
-      createBundle(cell.id, cell.content)
+      createBundle(cell.id, cumulativeCode)
     }, 1000)
 
     return () => {
       clearTimeout(timer)
     }
-  }, [cell.content, cell.id, createBundle])
+  }, [cumulativeCode, cell.id, createBundle])
 
   const onEditorChangeHandler = (value: string): void => {
     updateCell(cell.id, value)
