@@ -15,7 +15,7 @@ export const unpkgFetchPlugin = (inputCode: string): esbuild.Plugin => {
       // "onLoad" is a handler that is triggered when ESBUILD attempts to load the file by path
       // Here we are basically hijacking/overriding/intercepting the way that ESBUILD naturally
       // loads the files(it reads them from the filesystem)!
-      // We don't want ESBUILD to try and load "index.js" file from the hard-drive,
+      // We don't want ESBUILD to try and load "index.ts" file from the hard-drive,
       // but instead we return file content right away (we are currently mocking the file content)
       build.onLoad(
         { filter: /(^index\.js$)/ },
@@ -68,7 +68,7 @@ export const unpkgFetchPlugin = (inputCode: string): esbuild.Plugin => {
           // escape double quotes
           .replace(/"/g, '\\"')
           // escape single quotes
-          .replace(/'/g, "\\'")
+          .replace(/'/g, '\\\'')
 
         const contents = `
             const style = document.createElement('style');

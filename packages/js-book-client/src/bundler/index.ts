@@ -40,7 +40,7 @@ const bundler = async (rawCode: string): Promise<BundlerResult> => {
     const result = await service.build({
       // When we bundle the code with ESBUILD, we DON'T PROVIDE THE CODE!
       // Instead, we define the file where ESBUILD should start:
-      entryPoints: ['index.js'],
+      entryPoints: ['index.ts'],
       // Define if ESBUILD should also bundle the code (not only transpile it)
       bundle: true,
       write: false,
