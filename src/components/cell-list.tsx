@@ -2,6 +2,7 @@ import React from 'react'
 import { useTypedSelector } from '../hooks/use-typed-selector'
 import CellListItem from './cell-list-item'
 import AddCell from './add-cell'
+import './cell-list.css'
 
 const CellList: React.FC = () => {
   // To get cells in the same order that is stored in "order" property we apply selector:
@@ -20,10 +21,10 @@ const CellList: React.FC = () => {
   ))
 
   return (
-    <ul>
+    <div className="cell-list">
       <AddCell forceVisible={cellsList.length === 0} currentCellId={null} />
       {renderedCells}
-    </ul>
+    </div>
   )
 }
 
