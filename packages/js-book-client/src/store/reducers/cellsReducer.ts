@@ -107,6 +107,36 @@ const reducer = produce(
 
         return state
       }
+      case ActionType.FETCH_CELLS: {
+        state.loading = true
+        state.error = null
+
+        return state
+      }
+      case ActionType.FETCH_CELLS_COMPLETE: {
+        state.loading = false
+        state.order = action.payload.map((cell) => cell.id)
+        // Here's a little trick new: we can add type annotation to reduce function
+        // to satisfy TS.
+        state.data = action.payload.reduce<CellsState['data']>((acc, cur) => {
+          acc[cur.id] = cur
+
+          return acc
+        }, {})
+
+        return state
+      }
+      case ActionType.FETCH_CELLS_ERROR: {
+        state.loading = false
+        state.error = action.payload
+
+        return state
+      }
+      case ActionType.SAVE_CELLS_ERROR: {
+        state.error = action.payload
+
+        return state
+      }
       default:
         return state
     }

@@ -2,7 +2,7 @@
 // that describes the structure of an action (this is especially important
 // because of different payloads these actions will have):
 import { type ActionType } from '../action-types'
-import { type CellTypes } from '../cell'
+import { type Cell, type CellTypes } from '../cell'
 
 export type Direction = 'up' | 'down'
 
@@ -69,6 +69,25 @@ export interface BundleCompleteAction {
   }
 }
 
+export interface FetchCellsAction {
+  type: ActionType.FETCH_CELLS
+}
+
+export interface FetchCellsCompleteAction {
+  type: ActionType.FETCH_CELLS_COMPLETE
+  payload: Cell[]
+}
+
+export interface FetchCellsErrorAction {
+  type: ActionType.FETCH_CELLS_ERROR
+  payload: string
+}
+
+export interface SaveCellsErrorAction {
+  type: ActionType.SAVE_CELLS_ERROR
+  payload: string
+}
+
 // Now we need to export all these interfaces to use them in other files.
 // The easiest way of doing it is creating a type that is a UNION of these interfaces
 // and export it instead of exporting interfaces one by one:
@@ -79,3 +98,7 @@ export type Action =
   | UpdateCellAction
   | BundleStartAction
   | BundleCompleteAction
+  | FetchCellsAction
+  | FetchCellsCompleteAction
+  | FetchCellsErrorAction
+  | SaveCellsErrorAction
