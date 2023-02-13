@@ -20,6 +20,14 @@ const local_api_1 = require("local-api");
 const isLocalApiError = (err) => {
     return typeof err.code === 'string';
 };
+// We want to use PROXY ONLY IN DEVELOPMENT. So we'll use this flag
+// to make this decision and pass it as a 4th argument to "serve" command.
+// Later we will use a script that will find "process.env.NODE_ENV" inside raw js file
+// and replace it with "production"
+// "process.env.NODE_ENV === 'production'" -> "'production' === 'production'"
+// Which will result in user always running our app
+// in production mode("isProduction" will be true).
+const isProduction = process.env.NODE_ENV === 'production';
 // Define a command for CLI
 exports.serveCommand = new commander_1.Command()
     // Square brackets indicate that the parameter inside is OPTIONAL
@@ -44,7 +52,7 @@ exports.serveCommand = new commander_1.Command()
         // - "path.basename(filename)" results in "notebook.js".
         const dir = path_1.default.join(process.cwd(), path_1.default.dirname(filename));
         // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression,@typescript-eslint/await-thenable
-        yield (0, local_api_1.serve)(parseInt(options.port), path_1.default.basename(filename), dir);
+        yield (0, local_api_1.serve)(parseInt(options.port), path_1.default.basename(filename), dir, !isProduction);
         console.log(`Opened ${filename}. Navigate to http://localhost:${options.port} to edit the file`);
     }
     catch (err) {

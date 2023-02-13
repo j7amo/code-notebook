@@ -11,6 +11,15 @@ const isLocalApiError = (err: any): err is LocalApiError => {
   return typeof err.code === 'string'
 }
 
+// We want to use PROXY ONLY IN DEVELOPMENT. So we'll use this flag
+// to make this decision and pass it as a 4th argument to "serve" command.
+// Later we will use a script that will find "process.env.NODE_ENV" inside raw js file
+// and replace it with "production"
+// "process.env.NODE_ENV === 'production'" -> "'production' === 'production'"
+// Which will result in user always running our app
+// in production mode("isProduction" will be true).
+const isProduction = process.env.NODE_ENV === 'production'
+
 // Define a command for CLI
 export const serveCommand = new Command()
   // Square brackets indicate that the parameter inside is OPTIONAL
@@ -35,7 +44,12 @@ export const serveCommand = new Command()
       // - "path.basename(filename)" results in "notebook.js".
       const dir = path.join(process.cwd(), path.dirname(filename))
       // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression,@typescript-eslint/await-thenable
-      await serve(parseInt(options.port), path.basename(filename), dir)
+      await serve(
+        parseInt(options.port),
+        path.basename(filename),
+        dir,
+        !isProduction
+      )
       console.log(
         `Opened ${filename as string}. Navigate to http://localhost:${
           options.port
