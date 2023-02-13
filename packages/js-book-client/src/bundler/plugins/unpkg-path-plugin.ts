@@ -40,7 +40,7 @@ export const unpkgPathPlugin = (): esbuild.Plugin => {
         // when e.g. we want to load files from namespace "a" differently from files
         // from namespace "b" for some reason.
         return {
-          path: 'index.ts',
+          path: 'index.js',
           namespace: 'a'
         }
       })

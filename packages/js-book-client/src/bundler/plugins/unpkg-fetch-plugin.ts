@@ -68,7 +68,7 @@ export const unpkgFetchPlugin = (inputCode: string): esbuild.Plugin => {
           // escape double quotes
           .replace(/"/g, '\\"')
           // escape single quotes
-          .replace(/'/g, '\\\'')
+          .replace(/'/g, "\\'")
 
         const contents = `
             const style = document.createElement('style');
