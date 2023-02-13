@@ -1,4 +1,5 @@
 import { Command } from 'commander'
+import { serve } from 'local-api'
 
 // Define a command for CLI
 export const serveCommand = new Command()
@@ -8,7 +9,6 @@ export const serveCommand = new Command()
   // Angle brackets indicate that the parameter inside is REQUIRED
   .option('-p, --port <number>', 'Port to run server on', '4005')
   // Callback for the command
-  .action((filename = 'notebook.js', options) => {
-    console.log(filename)
-    console.log(options)
+  .action((filename = 'notebook.js', options: { port: string }) => {
+    serve(parseInt(options.port), filename, '/')
   })
