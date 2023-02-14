@@ -1,5 +1,5 @@
 # code-notebook
-A notebook that includes code and markdown editors to run and write docs for code snippets  
+A notebook that includes code and markdown editors to write docs and run code snippets  
 
 1. Inside project root directory run `lerna bootstrap -- --legacy-peer-deps` to install dependencies.
 2. Inside project root directory run `npm run start`
