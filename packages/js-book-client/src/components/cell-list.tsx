@@ -10,15 +10,11 @@ const CellList: React.FC = () => {
   const cellsList = useTypedSelector(({ cells: { data, order } }) =>
     order.map((id) => data[id])
   )
-  const { fetchCells, saveCells } = useActions()
+  const { fetchCells } = useActions()
 
   useEffect(() => {
     fetchCells()
   }, [fetchCells])
-
-  useEffect(() => {
-    saveCells()
-  }, [saveCells, JSON.stringify(cellsList)])
 
   const renderedCells = cellsList.map((cell) => (
     // We cannot just use a shorthand version of Fragment(i.e. <></>)
