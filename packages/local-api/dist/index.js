@@ -40,6 +40,8 @@ const cells_1 = require("./routes/cells");
 // eslint-disable-next-line @typescript-eslint/promise-function-async
 const serve = (port, filename, dir, useProxy) => {
     const app = (0, express_1.default)();
+    // We enable routing for cells read/write operations by using a corresponding router:
+    app.use('/', (0, cells_1.createCellsRouter)(filename, dir));
     // Are we actively developing our app on our local machine?
     // Then use proxy to local CRA dev server
     if (useProxy) {
@@ -83,8 +85,6 @@ const serve = (port, filename, dir, useProxy) => {
         // and that's it:
         app.use(express_1.default.static(path.dirname(packagePath)));
     }
-    // We enable routing for cells read/write operations by using a corresponding router:
-    app.use((0, cells_1.createCellsRouter)(filename, dir));
     return new Promise((resolve, reject) => {
         app.listen(port, resolve).on('error', reject);
     });

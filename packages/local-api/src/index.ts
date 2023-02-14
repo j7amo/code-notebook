@@ -17,6 +17,8 @@ export const serve = (
   useProxy: boolean
 ): Promise<void> => {
   const app = express()
+  // We enable routing for cells read/write operations by using a corresponding router:
+  app.use('/', createCellsRouter(filename, dir))
 
   // Are we actively developing our app on our local machine?
   // Then use proxy to local CRA dev server
@@ -64,9 +66,6 @@ export const serve = (
     // and that's it:
     app.use(express.static(path.dirname(packagePath)))
   }
-
-  // We enable routing for cells read/write operations by using a corresponding router:
-  app.use(createCellsRouter(filename, dir))
 
   return new Promise<void>((resolve, reject) => {
     app.listen(port, resolve).on('error', reject)
